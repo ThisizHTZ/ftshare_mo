@@ -1,0 +1,29 @@
+﻿{
+    "output_dir":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132",
+    "components_csv":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132\\csi1000_components.csv",
+    "snapshots_csv":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132\\csi1000_snapshots.csv",
+    "latest_signals_csv":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132\\latest_signals.csv",
+    "dashboard_html":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132\\dashboard.html",
+    "daily_analysis_json":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132\\daily_analysis.json",
+    "sector_rotation_csv":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132\\sector_rotation.csv",
+    "prediction_watchlist_csv":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132\\prediction_watchlist.csv",
+    "industry_status":  "申万一级行业映射：20260708",
+    "summary":  [
+                    {
+                        "iteration":  1,
+                        "snapshot_time":  "2026-07-09 15:51:44.747",
+                        "matched_components":  1000,
+                        "signal_rows":  0,
+                        "approx_weighted_change":  2.4932660343407247,
+                        "snapshot_csv":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132\\snapshot_001.csv"
+                    },
+                    {
+                        "iteration":  2,
+                        "snapshot_time":  "2026-07-09 15:51:58.867",
+                        "matched_components":  1000,
+                        "signal_rows":  1000,
+                        "approx_weighted_change":  2.4932660343407247,
+                        "snapshot_csv":  "C:\\ftshare_data\\csi1000_intraday\\20260709_155132\\snapshot_002.csv"
+                    }
+                ]
+}

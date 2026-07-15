@@ -1,0 +1,155 @@
+﻿{
+    "up_count":  452,
+    "down_count":  533,
+    "flat_count":  15,
+    "avg_change_rate":  0.0070029341805667149,
+    "median_change_rate":  -0.0024955774441684573,
+    "total_turnover":  580421702897.08032,
+    "strong_observe_count":  134,
+    "volume_abnormal_count":  0,
+    "risk_warning_count":  0,
+    "top_contributors":  [
+                             {
+                                 "symbol":  "688048.SH",
+                                 "component_name":  "长光华芯",
+                                 "sw_level1_name":  "电子",
+                                 "weighted_change_contribution":  0.0896537355974782,
+                                 "change_rate":  0.14118698519287906
+                             },
+                             {
+                                 "symbol":  "688766.SH",
+                                 "component_name":  "普冉股份",
+                                 "sw_level1_name":  "电子",
+                                 "weighted_change_contribution":  0.0799381123919308,
+                                 "change_rate":  0.09808357348703169
+                             },
+                             {
+                                 "symbol":  "688627.SH",
+                                 "component_name":  "精智达",
+                                 "sw_level1_name":  "机械设备",
+                                 "weighted_change_contribution":  0.0562138775510204,
+                                 "change_rate":  0.10183673469387755
+                             },
+                             {
+                                 "symbol":  "688146.SH",
+                                 "component_name":  "中船特气",
+                                 "sw_level1_name":  "电子",
+                                 "weighted_change_contribution":  0.0561389728096677,
+                                 "change_rate":  0.09848942598187312
+                             },
+                             {
+                                 "symbol":  "300236.SZ",
+                                 "component_name":  "上海新阳",
+                                 "sw_level1_name":  "电子",
+                                 "weighted_change_contribution":  0.055516729969253,
+                                 "change_rate":  0.18755652016639535
+                             },
+                             {
+                                 "symbol":  "688362.SH",
+                                 "component_name":  "甬矽电子",
+                                 "sw_level1_name":  "电子",
+                                 "weighted_change_contribution":  0.0534857142857143,
+                                 "change_rate":  0.17142857142857143
+                             },
+                             {
+                                 "symbol":  "002484.SZ",
+                                 "component_name":  "江海股份",
+                                 "sw_level1_name":  "电子",
+                                 "weighted_change_contribution":  0.0525485181644359,
+                                 "change_rate":  0.08197896749521988
+                             },
+                             {
+                                 "symbol":  "688630.SH",
+                                 "component_name":  "芯碁微装",
+                                 "sw_level1_name":  "机械设备",
+                                 "weighted_change_contribution":  0.0489388496809365,
+                                 "change_rate":  0.09411317246333939
+                             },
+                             {
+                                 "symbol":  "688167.SH",
+                                 "component_name":  "炬光科技",
+                                 "sw_level1_name":  "电子",
+                                 "weighted_change_contribution":  0.0487442748091603,
+                                 "change_rate":  0.10305343511450382
+                             },
+                             {
+                                 "symbol":  "688409.SH",
+                                 "component_name":  "富创精密",
+                                 "sw_level1_name":  "电子",
+                                 "weighted_change_contribution":  0.046690874811463,
+                                 "change_rate":  0.08092006033182504
+                             }
+                         ],
+    "bottom_contributors":  [
+                                {
+                                    "symbol":  "002497.SZ",
+                                    "component_name":  "雅化集团",
+                                    "sw_level1_name":  "基础化工",
+                                    "weighted_change_contribution":  -0.0216128886885985,
+                                    "change_rate":  -0.0896800360522758
+                                },
+                                {
+                                    "symbol":  "002192.SZ",
+                                    "component_name":  "融捷股份",
+                                    "sw_level1_name":  "有色金属",
+                                    "weighted_change_contribution":  -0.0189913479052823,
+                                    "change_rate":  -0.09995446265938068
+                                },
+                                {
+                                    "symbol":  "002747.SZ",
+                                    "component_name":  "埃斯顿",
+                                    "sw_level1_name":  "机械设备",
+                                    "weighted_change_contribution":  -0.0116553287981859,
+                                    "change_rate":  -0.0582766439909297
+                                },
+                                {
+                                    "symbol":  "603950.SH",
+                                    "component_name":  "长源东谷",
+                                    "sw_level1_name":  "未映射",
+                                    "weighted_change_contribution":  -0.0110260422749037,
+                                    "change_rate":  -0.0984468060259255
+                                },
+                                {
+                                    "symbol":  "603929.SH",
+                                    "component_name":  "亚翔集成",
+                                    "sw_level1_name":  "建筑装饰",
+                                    "weighted_change_contribution":  -0.0105384650462857,
+                                    "change_rate":  -0.04427926490036026
+                                },
+                                {
+                                    "symbol":  "600259.SH",
+                                    "component_name":  "中稀有色",
+                                    "sw_level1_name":  "有色金属",
+                                    "weighted_change_contribution":  -0.00991011235955056,
+                                    "change_rate":  -0.040449438202247195
+                                },
+                                {
+                                    "symbol":  "000628.SZ",
+                                    "component_name":  "高新发展",
+                                    "sw_level1_name":  "建筑装饰",
+                                    "weighted_change_contribution":  -0.0086,
+                                    "change_rate":  -0.09999999999999999
+                                },
+                                {
+                                    "symbol":  "000970.SZ",
+                                    "component_name":  "中科三环",
+                                    "sw_level1_name":  "有色金属",
+                                    "weighted_change_contribution":  -0.00849215317011927,
+                                    "change_rate":  -0.05586942875078468
+                                },
+                                {
+                                    "symbol":  "601677.SH",
+                                    "component_name":  "明泰铝业",
+                                    "sw_level1_name":  "有色金属",
+                                    "weighted_change_contribution":  -0.00700381194409149,
+                                    "change_rate":  -0.03303684879288437
+                                },
+                                {
+                                    "symbol":  "002249.SZ",
+                                    "component_name":  "大洋电机",
+                                    "sw_level1_name":  "电力设备",
+                                    "weighted_change_contribution":  -0.00695308310991957,
+                                    "change_rate":  -0.05227882037533512
+                                }
+                            ]
+}

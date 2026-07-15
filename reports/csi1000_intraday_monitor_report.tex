@@ -1,0 +1,257 @@
+\documentclass[UTF8,a4paper,12pt]{ctexart}
+
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\geometry{left=2.5cm,right=2.5cm,top=2.6cm,bottom=2.6cm}
+
+\title{中证1000盘中快照监控与短周期信号说明报告}
+\author{FTShare 实时行情数据实验}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{数据目标}
+
+本文说明如何基于中证1000成分股的盘中实时快照数据，构造用于行情监控和短周期交易研究的信号体系。当前数据并非逐笔成交或盘口订单簿，而是通过周期性轮询实时行情快照接口得到的准高频快照序列。
+
+每一轮快照包含中证1000成分股的最新价、涨跌幅、成交量、成交额、振幅、权重等字段。将相邻两轮快照进行差分，可以得到短周期价格变化、成交量增量和成交额增量，从而支持盘中涨速监控、成交额放大识别、成分股内部排名、短周期动量、异动股筛选以及指数贡献度粗估。
+
+\section{数据结构}
+
+当前监控系统主要生成三类文件：
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+文件 & 含义 & 主要用途 \\
+\midrule
+\texttt{csi1000\_components.csv} & 中证1000成分股与权重 & 股票池、指数贡献度计算 \\
+\texttt{csi1000\_snapshots.csv} & 每轮盘中快照 & 保存原始轮询数据 \\
+\texttt{latest\_signals.csv} & 最新一轮短周期信号 & 排名、筛选、监控 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+核心字段说明如下：
+
+\begin{longtable}{lll}
+\toprule
+字段 & 含义 & 备注 \\
+\midrule
+\endhead
+\texttt{snapshot\_time} & 本地快照采集时间 & 用于构造时间序列 \\
+\texttt{symbol} & 股票代码 & 如 \texttt{000636.SZ} \\
+\texttt{component\_name} & 成分股名称 & 如风华高科 \\
+\texttt{weight} & 中证1000权重 & 来自指数权重接口 \\
+\texttt{close} & 当前最新价 & 盘中不等于日终收盘价 \\
+\texttt{change\_rate} & 当日涨跌幅 & 相对昨收 \\
+\texttt{volume} & 当日累计成交量 & 快照时刻的累计值 \\
+\texttt{turnover} & 当日累计成交额 & 快照时刻的累计值 \\
+\texttt{amplitude} & 当日振幅 & 通常为高低价相对昨收的波动幅度 \\
+\texttt{interval\_return} & 相邻快照收益率 & 短周期价格变化 \\
+\texttt{volume\_delta} & 相邻快照成交量增量 & 短周期成交活跃度 \\
+\texttt{turnover\_delta} & 相邻快照成交额增量 & 短周期资金活跃度 \\
+\bottomrule
+\end{longtable}
+
+\section{盘中涨速监控}
+
+盘中涨速监控用于识别短时间内价格快速上行或下行的股票。设第 $t$ 次快照中股票 $i$ 的最新价为 $P_{i,t}$，上一轮快照价格为 $P_{i,t-1}$，则相邻快照收益率为：
+
+\begin{equation}
+r_{i,t}^{\Delta} = \frac{P_{i,t} - P_{i,t-1}}{P_{i,t-1}}.
+\end{equation}
+
+若快照间隔为 $\Delta T$ 秒，则可以将其年化或标准化为单位时间涨速：
+
+\begin{equation}
+v_{i,t} = \frac{r_{i,t}^{\Delta}}{\Delta T}.
+\end{equation}
+
+在实际监控中，可以按照 $r_{i,t}^{\Delta}$ 或 $v_{i,t}$ 从高到低排序。涨速靠前的股票代表短周期买盘推动较强；跌速靠前的股票则可能出现短线抛压。
+
+常见触发条件包括：
+
+\begin{itemize}
+  \item $r_{i,t}^{\Delta} > 0.3\%$，短周期快速上涨；
+  \item $r_{i,t}^{\Delta} < -0.3\%$，短周期快速下跌；
+  \item 连续 $k$ 个快照均为正收益，形成持续上行。
+\end{itemize}
+
+\section{成交额突然放大}
+
+成交额突然放大是盘中异动识别的重要指标。实时快照中的 \texttt{turnover} 是当日累计成交额，因此相邻两轮快照的成交额差分为：
+
+\begin{equation}
+\Delta A_{i,t} = A_{i,t} - A_{i,t-1},
+\end{equation}
+
+其中 $A_{i,t}$ 表示股票 $i$ 在第 $t$ 次快照时的累计成交额。
+
+若 $\Delta A_{i,t}$ 明显高于股票自身近期平均水平，说明该股票在当前短周期内资金活跃度突然提升。可定义成交额放大倍数：
+
+\begin{equation}
+B_{i,t} = \frac{\Delta A_{i,t}}{\overline{\Delta A}_{i,t-m:t-1} + \epsilon},
+\end{equation}
+
+其中 $\overline{\Delta A}_{i,t-m:t-1}$ 是过去 $m$ 个快照的平均成交额增量，$\epsilon$ 用于避免分母为零。
+
+实盘监控中，成交额放大可与涨速结合：
+
+\begin{equation}
+S_{i,t}^{money} = r_{i,t}^{\Delta} \times \log(1 + \Delta A_{i,t}).
+\end{equation}
+
+该指标倾向于找出“价格上行且成交额同步放大”的股票。
+
+\section{中证1000内部涨跌排名}
+
+中证1000内部涨跌排名用于观察成分股的相对强弱。使用当日涨跌幅 \texttt{change\_rate}，对全部成分股排序：
+
+\begin{equation}
+Rank_{i,t}^{day} = rank(-R_{i,t}^{day}),
+\end{equation}
+
+其中 $R_{i,t}^{day}$ 为股票 $i$ 在快照 $t$ 的当日涨跌幅。排名越小，表示当日表现越强。
+
+同时可以对短周期收益率排序：
+
+\begin{equation}
+Rank_{i,t}^{short} = rank(-r_{i,t}^{\Delta}).
+\end{equation}
+
+两类排名对应不同含义：
+
+\begin{itemize}
+  \item 当日涨跌排名：反映股票当天整体强弱；
+  \item 短周期涨跌排名：反映最近一个快照周期内的边际变化。
+\end{itemize}
+
+如果某股票当日排名较低，但短周期排名快速上升，说明它可能刚刚开始异动。
+
+\section{短周期动量}
+
+短周期动量关注价格变化是否具有连续性。设最近 $n$ 个快照收益率为 $r_{i,t-n+1}^{\Delta}, \ldots, r_{i,t}^{\Delta}$，可以定义短周期动量为：
+
+\begin{equation}
+M_{i,t}^{(n)} = \sum_{j=0}^{n-1} r_{i,t-j}^{\Delta}.
+\end{equation}
+
+也可以加入成交额权重，构造量价动量：
+
+\begin{equation}
+M_{i,t}^{money} = \sum_{j=0}^{n-1} r_{i,t-j}^{\Delta} \cdot \log(1 + \Delta A_{i,t-j}).
+\end{equation}
+
+短周期动量适合用于：
+
+\begin{itemize}
+  \item 捕捉盘中趋势延续；
+  \item 识别从弱转强的股票；
+  \item 过滤无量上涨或无量下跌。
+\end{itemize}
+
+需要注意的是，快照数据不是逐笔数据，无法还原两个快照之间的精确成交路径。因此该动量属于采样动量，而非完整 tick 动量。
+
+\section{异动股筛选}
+
+异动股筛选可以将多个条件组合为规则。一个简单的筛选框架如下：
+
+\begin{equation}
+I_{i,t} =
+\mathbb{1}(r_{i,t}^{\Delta} > \theta_r)
+\cdot
+\mathbb{1}(\Delta A_{i,t} > \theta_A)
+\cdot
+\mathbb{1}(R_{i,t}^{day} > \theta_d),
+\end{equation}
+
+其中 $\theta_r$ 是短周期收益阈值，$\theta_A$ 是成交额增量阈值，$\theta_d$ 是当日涨跌幅阈值。
+
+也可以使用综合打分：
+
+\begin{equation}
+Score_{i,t}
+= z(r_{i,t}^{\Delta})
++ z(\Delta A_{i,t})
++ z(R_{i,t}^{day})
++ z(Amplitude_{i,t}),
+\end{equation}
+
+其中 $z(\cdot)$ 表示在中证1000成分股内部做标准化。综合分数越高，代表越值得关注。
+
+实务中可以分成三类异动：
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+类型 & 条件特征 & 解释 \\
+\midrule
+放量上涨 & 涨速高、成交额增量高 & 资金主动推动 \\
+放量下跌 & 跌速高、成交额增量高 & 抛压或利空释放 \\
+高振幅活跃 & 振幅高、成交额高 & 多空分歧较大 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{成分股贡献度粗估}
+
+中证1000指数由成分股按权重加权构成。若忽略复权、价格调整、指数除数等细节，可以用成分股权重和涨跌幅粗略估计对指数涨跌的贡献：
+
+\begin{equation}
+C_{i,t} = w_i \cdot R_{i,t}^{day},
+\end{equation}
+
+其中 $w_i$ 是成分股权重，$R_{i,t}^{day}$ 是当日涨跌幅。
+
+指数整体涨跌幅可粗略估计为：
+
+\begin{equation}
+\hat{R}_{index,t} = \sum_{i=1}^{N} w_i R_{i,t}^{day}.
+\end{equation}
+
+在短周期维度，也可以用：
+
+\begin{equation}
+C_{i,t}^{\Delta} = w_i \cdot r_{i,t}^{\Delta}.
+\end{equation}
+
+该指标可以回答两个问题：
+
+\begin{itemize}
+  \item 当前是谁在拉动中证1000？
+  \item 当前是谁在拖累中证1000？
+\end{itemize}
+
+需要强调的是，这只是粗估。真实指数点位还涉及指数编制规则、除数调整、停牌处理、权重更新和价格取值规则，因此该指标更适合监控和解释，不适合作为精确指数复刻。
+
+\section{推荐监控面板}
+
+基于当前数据，可以构建如下盘中监控面板：
+
+\begin{enumerate}
+  \item 涨速榜：按 \texttt{interval\_return} 降序；
+  \item 成交额增量榜：按 \texttt{turnover\_delta} 降序；
+  \item 量价共振榜：按 $r_{i,t}^{\Delta} \cdot \log(1+\Delta A_{i,t})$ 降序；
+  \item 当日强势榜：按 \texttt{change\_rate} 降序；
+  \item 权重贡献榜：按 \texttt{weighted\_change\_contribution} 降序；
+  \item 风险预警榜：按负向短周期收益和成交额增量组合排序。
+\end{enumerate}
+
+\section{结论}
+
+中证1000盘中快照轮询数据适合用于短周期行情监控和信号发现。它可以支持涨速监控、成交额放大识别、内部排名、短周期动量、异动股筛选和指数贡献度粗估。
+
+不过，该数据源的本质是快照序列，而非逐笔成交或盘口订单簿。因此，它适合做盘中监控、异动发现和短周期统计，不适合做严格的 tick 级回测或盘口微结构研究。更稳妥的实践路径是：先用快照数据筛选异动股，再对少量异动标的进一步拉取逐笔成交数据进行验证。
+
+\end{document}

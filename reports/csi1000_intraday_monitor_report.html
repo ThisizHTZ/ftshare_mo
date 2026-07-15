@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>中证1000盘中快照监控与短周期信号说明报告</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f6f7f9;
+      color: #1f2937;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.75;
+    }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 48px 28px 72px;
+      background: #fff;
+      min-height: 100vh;
+      box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+    }
+    h1 {
+      font-size: 30px;
+      line-height: 1.3;
+      margin: 0 0 8px;
+    }
+    h2 {
+      font-size: 22px;
+      margin-top: 38px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    h3 {
+      font-size: 18px;
+      margin-top: 26px;
+    }
+    .meta {
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f3f4f6;
+      font-weight: 700;
+    }
+    code {
+      background: #f3f4f6;
+      color: #b91c1c;
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.92em;
+    }
+    pre {
+      background: #111827;
+      color: #e5e7eb;
+      padding: 14px 16px;
+      overflow-x: auto;
+      border-radius: 8px;
+      line-height: 1.6;
+    }
+    .formula {
+      margin: 14px 0 20px;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-left: 4px solid #2563eb;
+      font-family: "Times New Roman", "Cambria Math", serif;
+      font-size: 18px;
+      overflow-x: auto;
+    }
+    .note {
+      padding: 12px 16px;
+      background: #fff7ed;
+      border-left: 4px solid #f97316;
+      margin: 18px 0;
+    }
+    ul, ol {
+      padding-left: 24px;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>中证1000盘中快照监控与短周期信号说明报告</h1>
+  <div class="meta">基于 FTShare 实时行情快照数据生成。适用于盘中监控、异动发现和短周期统计。</div>
+
+  <h2>1. 数据目标</h2>
+  <p>
+    本报告说明如何基于中证1000成分股的盘中实时快照数据，构造用于行情监控和短周期交易研究的信号体系。
+    当前数据不是逐笔成交，也不是盘口订单簿，而是通过周期性轮询实时行情快照接口得到的准高频快照序列。
+  </p>
+  <p>
+    每一轮快照包含中证1000成分股的最新价、涨跌幅、成交量、成交额、振幅和权重等字段。
+    将相邻两轮快照做差分，可以得到短周期价格变化、成交量增量和成交额增量。
+  </p>
+
+  <h2>2. 数据结构</h2>
+  <table>
+    <thead>
+      <tr><th>文件</th><th>含义</th><th>主要用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>csi1000_components.csv</code></td><td>中证1000成分股与权重</td><td>股票池、指数贡献度计算</td></tr>
+      <tr><td><code>csi1000_snapshots.csv</code></td><td>每轮盘中快照</td><td>保存原始轮询数据</td></tr>
+      <tr><td><code>latest_signals.csv</code></td><td>最新一轮短周期信号</td><td>排名、筛选、监控</td></tr>
+    </tbody>
+  </table>
+
+  <table>
+    <thead>
+      <tr><th>字段</th><th>含义</th><th>备注</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>snapshot_time</code></td><td>本地快照采集时间</td><td>用于构造时间序列</td></tr>
+      <tr><td><code>symbol</code></td><td>股票代码</td><td>如 <code>000636.SZ</code></td></tr>
+      <tr><td><code>component_name</code></td><td>成分股名称</td><td>如风华高科</td></tr>
+      <tr><td><code>weight</code></td><td>中证1000权重</td><td>来自指数权重接口</td></tr>
+      <tr><td><code>close</code></td><td>当前最新价</td><td>盘中不等于日终收盘价</td></tr>
+      <tr><td><code>change_rate</code></td><td>当日涨跌幅</td><td>相对昨收</td></tr>
+      <tr><td><code>volume</code></td><td>当日累计成交量</td><td>快照时刻的累计值</td></tr>
+      <tr><td><code>turnover</code></td><td>当日累计成交额</td><td>快照时刻的累计值</td></tr>
+      <tr><td><code>interval_return</code></td><td>相邻快照收益率</td><td>短周期价格变化</td></tr>
+      <tr><td><code>volume_delta</code></td><td>相邻快照成交量增量</td><td>短周期成交活跃度</td></tr>
+      <tr><td><code>turnover_delta</code></td><td>相邻快照成交额增量</td><td>短周期资金活跃度</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. 盘中涨速监控</h2>
+  <p>
+    盘中涨速监控用于识别短时间内价格快速上行或下行的股票。设第 t 次快照中股票 i 的最新价为
+    <code>P(i,t)</code>，上一轮快照价格为 <code>P(i,t-1)</code>，则相邻快照收益率为：
+  </p>
+  <div class="formula">r(i,t) = [P(i,t) - P(i,t-1)] / P(i,t-1)</div>
+  <p>若快照间隔为 ΔT 秒，则单位时间涨速可写为：</p>
+  <div class="formula">v(i,t) = r(i,t) / ΔT</div>
+  <p>实务中可按 <code>interval_return</code> 从高到低排序，识别短周期买盘推动较强的股票。</p>
+  <ul>
+    <li><code>interval_return &gt; 0.3%</code>：短周期快速上涨。</li>
+    <li><code>interval_return &lt; -0.3%</code>：短周期快速下跌。</li>
+    <li>连续多个快照为正收益：可能形成盘中趋势。</li>
+  </ul>
+
+  <h2>4. 成交额突然放大</h2>
+  <p>
+    快照中的 <code>turnover</code> 是当日累计成交额，因此相邻两轮快照的成交额差分为：
+  </p>
+  <div class="formula">ΔA(i,t) = A(i,t) - A(i,t-1)</div>
+  <p>
+    若 <code>turnover_delta</code> 明显高于股票自身近期平均水平，说明该股票在当前短周期内资金活跃度突然提升。
+  </p>
+  <div class="formula">B(i,t) = ΔA(i,t) / [avg(ΔA(i,t-m) ... ΔA(i,t-1)) + ε]</div>
+  <p>可以进一步构造量价共振信号：</p>
+  <div class="formula">S(i,t) = r(i,t) × log(1 + ΔA(i,t))</div>
+  <p>这个指标倾向于找出“价格上行且成交额同步放大”的股票。</p>
+
+  <h2>5. 中证1000内部涨跌排名</h2>
+  <p>
+    中证1000内部涨跌排名用于观察成分股的相对强弱。可以分别按照当日涨跌幅和短周期收益率排序。
+  </p>
+  <div class="formula">Rank_day(i,t) = rank(-change_rate(i,t))</div>
+  <div class="formula">Rank_short(i,t) = rank(-interval_return(i,t))</div>
+  <ul>
+    <li>当日涨跌排名：反映股票当天整体强弱。</li>
+    <li>短周期涨跌排名：反映最近一个快照周期内的边际变化。</li>
+  </ul>
+  <p>如果某股票当日排名一般，但短周期排名快速上升，说明它可能刚刚开始异动。</p>
+
+  <h2>6. 短周期动量</h2>
+  <p>
+    短周期动量关注价格变化是否具有连续性。设最近 n 个快照收益率为 <code>r(t-n+1) ... r(t)</code>，
+    可以定义短周期动量为：
+  </p>
+  <div class="formula">M(i,t,n) = Σ r(i,t-j), j = 0 ... n-1</div>
+  <p>也可以加入成交额权重，构造量价动量：</p>
+  <div class="formula">M_money(i,t,n) = Σ r(i,t-j) × log(1 + ΔA(i,t-j))</div>
+  <p>短周期动量适合捕捉盘中趋势延续、识别从弱转强的股票，并过滤无量上涨或无量下跌。</p>
+
+  <h2>7. 异动股筛选</h2>
+  <p>异动股筛选可以将多个条件组合成规则：</p>
+  <div class="formula">I(i,t) = 1[r(i,t) &gt; θr] × 1[ΔA(i,t) &gt; θA] × 1[change_rate(i,t) &gt; θd]</div>
+  <p>也可以使用综合打分：</p>
+  <div class="formula">Score(i,t) = z(interval_return) + z(turnover_delta) + z(change_rate) + z(amplitude)</div>
+  <table>
+    <thead>
+      <tr><th>类型</th><th>条件特征</th><th>解释</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>放量上涨</td><td>涨速高、成交额增量高</td><td>资金主动推动</td></tr>
+      <tr><td>放量下跌</td><td>跌速高、成交额增量高</td><td>抛压或利空释放</td></tr>
+      <tr><td>高振幅活跃</td><td>振幅高、成交额高</td><td>多空分歧较大</td></tr>
+    </tbody>
+  </table>
+
+  <h2>8. 成分股贡献度粗估</h2>
+  <p>
+    若忽略复权、指数除数、停牌处理等细节，可以用成分股权重和涨跌幅粗略估计对指数涨跌的贡献：
+  </p>
+  <div class="formula">C(i,t) = weight(i) × change_rate(i,t)</div>
+  <p>指数整体涨跌幅可粗略估计为：</p>
+  <div class="formula">R_index_hat(t) = Σ weight(i) × change_rate(i,t)</div>
+  <p>短周期维度也可以使用：</p>
+  <div class="formula">C_short(i,t) = weight(i) × interval_return(i,t)</div>
+  <p>
+    该指标可以回答“当前是谁在拉动中证1000”和“当前是谁在拖累中证1000”。
+    需要强调的是，这只是粗估，更适合解释和监控，不适合作为精确指数复刻。
+  </p>
+
+  <h2>9. 推荐监控面板</h2>
+  <ol>
+    <li>涨速榜：按 <code>interval_return</code> 降序。</li>
+    <li>成交额增量榜：按 <code>turnover_delta</code> 降序。</li>
+    <li>量价共振榜：按 <code>interval_return × log(1 + turnover_delta)</code> 降序。</li>
+    <li>当日强势榜：按 <code>change_rate</code> 降序。</li>
+    <li>权重贡献榜：按 <code>weighted_change_contribution</code> 降序。</li>
+    <li>风险预警榜：按负向短周期收益和成交额增量组合排序。</li>
+  </ol>
+
+  <h2>10. 结论</h2>
+  <p>
+    中证1000盘中快照轮询数据适合用于短周期行情监控和信号发现。它可以支持涨速监控、
+    成交额放大识别、内部排名、短周期动量、异动股筛选和指数贡献度粗估。
+  </p>
+  <div class="note">
+    但该数据源本质是快照序列，不是逐笔成交或盘口订单簿。因此，它适合做盘中监控、异动发现和短周期统计，
+    不适合做严格的 tick 级回测或盘口微结构研究。更稳妥的做法是：先用快照筛选异动股，再对少量异动标的拉取逐笔成交数据验证。
+  </div>
+</main>
+</body>
+</html>
