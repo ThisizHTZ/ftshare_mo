@@ -567,8 +567,8 @@ body{margin:0;background:#f4f6f9;color:#182230;font-family:-apple-system,BlinkMa
 
 $Components=@(Get-IndexWeights);$ComponentsPath=Join-Path $RunDir 'csi1000_components.csv';$Components|Export-Csv $ComponentsPath -NoTypeInformation -Encoding UTF8
 $IndustryResult=Get-SwIndustryMap;$IndustryStatus=if($IndustryResult.Available){"申万一级行业映射：$($IndustryResult.Date)"}else{"行业数据不可用：$($IndustryResult.Error)"}
-$AllSnapshotsPath=Join-Path $RunDir 'csi1000_snapshots.csv';$LatestSignalsPath=Join-Path $RunDir 'latest_signals.csv';$DashboardPath=Join-Path $RunDir 'dashboard.html';$SummaryPath=Join-Path $RunDir 'summary.json';$DailyAnalysisPath=Join-Path $RunDir 'daily_analysis.json';$SectorRotationPath=Join-Path $RunDir 'sector_rotation.csv';$PredictionWatchlistPath=Join-Path $RunDir 'prediction_watchlist.csv';$DataQualityPath=Join-Path $RunDir 'data_quality.json'
-$History=@();$IterationSummary=@();$LastValidSignals=@();$LastValidSignalTime=$null;$Fallback=Get-LastValidArtifact $OutRoot $RunDir (Get-Date)
+$AllSnapshotsPath=Join-Path $RunDir 'csi1000_snapshots.csv';$LatestSignalsPath=Join-Path $RunDir 'latest_signals.csv';$DashboardPath=Join-Path $RunDir 'dashboard.html';$SummaryPath=Join-Path $RunDir 'summary.json';$DailyAnalysisPath=Join-Path $RunDir 'daily_analysis.json';$SectorRotationPath=Join-Path $RunDir 'sector_rotation.csv';$PredictionWatchlistPath=Join-Path $RunDir 'prediction_watchlist.csv';$DataQualityPath=Join-Path $RunDir 'data_quality.json';$LatestSnapshotPath=Join-Path $RunDir 'latest_snapshot.csv';$SnapshotManifestPath=Join-Path $RunDir 'snapshot_manifest.csv';$LiveManifestPath=Join-Path $RunDir 'snapshot_manifest.json'
+$History=@();$IterationSummary=@();$SnapshotManifestRows=@();$LastValidSignals=@();$LastValidSignalTime=$null;$Fallback=Get-LastValidArtifact $OutRoot $RunDir (Get-Date)
 if($Fallback){$LastValidSignals=@($Fallback.signals);$LastValidSignalTime=$Fallback.time}
 for($Iteration=1;$Iteration-le$Iterations;$Iteration++){
  if($SessionOnly){if(-not(Wait-ForTradingSession)){break}}
@@ -579,6 +579,11 @@ for($Iteration=1;$Iteration-le$Iterations;$Iteration++){
  $Quality.last_valid_signal_time=if($LastValidSignalTime){$LastValidSignalTime.ToString('yyyy-MM-dd HH:mm:ss')}else{$null}
  $History+=,[pscustomobject]@{at=$RequestStart;rows=$SnapshotRows;quality=$Quality}
  $SnapshotPath=Join-Path $RunDir ("snapshot_{0:000}.csv"-f$Iteration);$SnapshotRows|Export-Csv $SnapshotPath -NoTypeInformation -Encoding UTF8
+ $SnapshotRows|Export-Csv $LatestSnapshotPath -NoTypeInformation -Encoding UTF8
+ $ManifestRow=[pscustomobject]@{iteration=$Iteration;snapshot_time=$SnapshotTime;request_start=$RequestStart.ToString('yyyy-MM-dd HH:mm:ss.fff');request_end=$RequestEnd.ToString('yyyy-MM-dd HH:mm:ss.fff');market_status=$Quality.market_status;is_valid_snapshot=$Quality.is_valid_snapshot;matched_components=$SnapshotRows.Count;field_coverage=$Quality.field_coverage.overall;changed_symbol_ratio=$Quality.changed_symbol_ratio;regression_ratio=$Quality.regression_ratio;snapshot_csv=$SnapshotPath;signals_csv=(Join-Path $RunDir ("signals_{0:000}.csv"-f$Iteration));quality_json=(Join-Path $RunDir ("quality_{0:000}.json"-f$Iteration))}
+ $SnapshotManifestRows+=,$ManifestRow
+ $SnapshotManifestRows|Export-Csv $SnapshotManifestPath -NoTypeInformation -Encoding UTF8
+ [pscustomobject]@{output_dir=$RunDir;latest_iteration=$Iteration;latest_snapshot_csv=$LatestSnapshotPath;latest_signals_csv=$LatestSignalsPath;latest_quality_json=$DataQualityPath;snapshot_manifest_csv=$SnapshotManifestPath;snapshots=$SnapshotManifestRows}|ConvertTo-Json -Depth 6|Set-Content $LiveManifestPath -Encoding UTF8
  if($Iteration-eq1){$SnapshotRows|Export-Csv $AllSnapshotsPath -NoTypeInformation -Encoding UTF8}else{$SnapshotRows|ConvertTo-Csv -NoTypeInformation|Select-Object -Skip 1|Add-Content $AllSnapshotsPath -Encoding UTF8}
  $Quality|ConvertTo-Json -Depth 6|Set-Content $DataQualityPath -Encoding UTF8;$Quality|ConvertTo-Json -Depth 6|Set-Content (Join-Path $RunDir ("quality_{0:000}.json"-f$Iteration)) -Encoding UTF8
  $DisplaySignals=if($Quality.is_valid_snapshot){$Signals}elseif($LastValidSignals.Count){$LastValidSignals}else{$Signals};$UsingFallback=(-not$Quality.is_valid_snapshot-and$LastValidSignals.Count-gt0)
@@ -594,3 +599,5 @@ for($Iteration=1;$Iteration-le$Iterations;$Iteration++){
  }
 }
 $Result=[pscustomobject]@{output_dir=$RunDir;components_csv=$ComponentsPath;snapshots_csv=$AllSnapshotsPath;latest_signals_csv=$LatestSignalsPath;data_quality_json=$DataQualityPath;dashboard_html=$DashboardPath;daily_analysis_json=$DailyAnalysisPath;sector_rotation_csv=$SectorRotationPath;prediction_watchlist_csv=$PredictionWatchlistPath;industry_status=$IndustryStatus;summary=$IterationSummary};$Result|ConvertTo-Json -Depth 6|Set-Content $SummaryPath -Encoding UTF8;$Result|ConvertTo-Json -Depth 6
+
+

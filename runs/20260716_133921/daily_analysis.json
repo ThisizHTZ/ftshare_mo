@@ -1,0 +1,155 @@
+﻿{
+    "up_count":  412,
+    "down_count":  557,
+    "flat_count":  31,
+    "avg_change_rate":  -0.01031888910708839,
+    "median_change_rate":  -0.0043243293783250588,
+    "total_turnover":  473087056560.00031,
+    "strong_observe_count":  41,
+    "volume_abnormal_count":  42,
+    "risk_warning_count":  106,
+    "top_contributors":  [
+                             {
+                                 "symbol":  "600246.SH",
+                                 "component_name":  "万通发展",
+                                 "sw_level1_name":  "房地产",
+                                 "weighted_change_contribution":  0.0252780867630701,
+                                 "change_rate":  0.08342602892102335
+                             },
+                             {
+                                 "symbol":  "300638.SZ",
+                                 "component_name":  "广和通",
+                                 "sw_level1_name":  "通信",
+                                 "weighted_change_contribution":  0.011963696369637,
+                                 "change_rate":  0.13751375137513752
+                             },
+                             {
+                                 "symbol":  "688208.SH",
+                                 "component_name":  "道通科技",
+                                 "sw_level1_name":  "计算机",
+                                 "weighted_change_contribution":  0.0117727089220832,
+                                 "change_rate":  0.09729511505853856
+                             },
+                             {
+                                 "symbol":  "688146.SH",
+                                 "component_name":  "中船特气",
+                                 "sw_level1_name":  "电子",
+                                 "weighted_change_contribution":  0.0105871779508688,
+                                 "change_rate":  0.018573996405032957
+                             },
+                             {
+                                 "symbol":  "603127.SH",
+                                 "component_name":  "昭衍新药",
+                                 "sw_level1_name":  "医药生物",
+                                 "weighted_change_contribution":  0.0089883445278546,
+                                 "change_rate":  0.05195574871592256
+                             },
+                             {
+                                 "symbol":  "603950.SH",
+                                 "component_name":  "长源东谷",
+                                 "sw_level1_name":  "未映射",
+                                 "weighted_change_contribution":  0.00778837319816252,
+                                 "change_rate":  0.06953904641216536
+                             },
+                             {
+                                 "symbol":  "688353.SH",
+                                 "component_name":  "华盛锂电",
+                                 "sw_level1_name":  "电力设备",
+                                 "weighted_change_contribution":  0.00765002371916509,
+                                 "change_rate":  0.08052656546489564
+                             },
+                             {
+                                 "symbol":  "002747.SZ",
+                                 "component_name":  "埃斯顿",
+                                 "sw_level1_name":  "机械设备",
+                                 "weighted_change_contribution":  0.00748166259168704,
+                                 "change_rate":  0.03740831295843521
+                             },
+                             {
+                                 "symbol":  "603881.SH",
+                                 "component_name":  "数据港",
+                                 "sw_level1_name":  "通信",
+                                 "weighted_change_contribution":  0.00735509355509356,
+                                 "change_rate":  0.055301455301455305
+                             },
+                             {
+                                 "symbol":  "603236.SH",
+                                 "component_name":  "移远通信",
+                                 "sw_level1_name":  "通信",
+                                 "weighted_change_contribution":  0.00714764439187857,
+                                 "change_rate":  0.04829489453972009
+                             }
+                         ],
+    "bottom_contributors":  [
+                                {
+                                    "symbol":  "688766.SH",
+                                    "component_name":  "普冉股份",
+                                    "sw_level1_name":  "电子",
+                                    "weighted_change_contribution":  -0.0733217993079585,
+                                    "change_rate":  -0.08996539792387544
+                                },
+                                {
+                                    "symbol":  "688630.SH",
+                                    "component_name":  "芯碁微装",
+                                    "sw_level1_name":  "机械设备",
+                                    "weighted_change_contribution":  -0.0564579706107668,
+                                    "change_rate":  -0.10857302040532071
+                                },
+                                {
+                                    "symbol":  "300672.SZ",
+                                    "component_name":  "国科微",
+                                    "sw_level1_name":  "电子",
+                                    "weighted_change_contribution":  -0.0515741281901422,
+                                    "change_rate":  -0.11211766997857003
+                                },
+                                {
+                                    "symbol":  "605376.SH",
+                                    "component_name":  "博迁新材",
+                                    "sw_level1_name":  "有色金属",
+                                    "weighted_change_contribution":  -0.0510082940315498,
+                                    "change_rate":  -0.10001626280696048
+                                },
+                                {
+                                    "symbol":  "688110.SH",
+                                    "component_name":  "东芯股份",
+                                    "sw_level1_name":  "电子",
+                                    "weighted_change_contribution":  -0.0475599674200774,
+                                    "change_rate":  -0.07350845041743025
+                                },
+                                {
+                                    "symbol":  "002484.SZ",
+                                    "component_name":  "江海股份",
+                                    "sw_level1_name":  "电子",
+                                    "weighted_change_contribution":  -0.0469842931937173,
+                                    "change_rate":  -0.07329842931937174
+                                },
+                                {
+                                    "symbol":  "600667.SH",
+                                    "component_name":  "太极实业",
+                                    "sw_level1_name":  "建筑装饰",
+                                    "weighted_change_contribution":  -0.0437789524267179,
+                                    "change_rate":  -0.0999519461797213
+                                },
+                                {
+                                    "symbol":  "603083.SH",
+                                    "component_name":  "剑桥科技",
+                                    "sw_level1_name":  "通信",
+                                    "weighted_change_contribution":  -0.0429024507448342,
+                                    "change_rate":  -0.05958673714560308
+                                },
+                                {
+                                    "symbol":  "688409.SH",
+                                    "component_name":  "富创精密",
+                                    "sw_level1_name":  "电子",
+                                    "weighted_change_contribution":  -0.0362200735453169,
+                                    "change_rate":  -0.06277309106640709
+                                },
+                                {
+                                    "symbol":  "688141.SH",
+                                    "component_name":  "杰华特",
+                                    "sw_level1_name":  "电子",
+                                    "weighted_change_contribution":  -0.0356296992481203,
+                                    "change_rate":  -0.08383458646616541
+                                }
+                            ]
+}

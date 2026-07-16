@@ -1,0 +1,11 @@
+﻿{
+    "archived_at":  "2026-07-16 16:04:15",
+    "trade_date":  "2026-07-16",
+    "daily_dir":  "C:\\ftshare_data\\daily_intraday_summary\\20260716_133921",
+    "fundamental_dir":  "C:\\ftshare_data\\fundamental_nlp\\20260716_20260716_160346",
+    "dashboard_html":  "C:\\ftshare_data\\daily_intraday_summary\\20260716_133921\\integrated_research_dashboard.html",
+    "ai_summary_json":  "C:\\ftshare_data\\daily_intraday_summary\\20260716_133921\\ai_research_summary.json",
+    "ai_summary_markdown":  "C:\\ftshare_data\\daily_intraday_summary\\20260716_133921\\ai_research_summary.md",
+    "ai_summary_html":  "C:\\ftshare_data\\daily_intraday_summary\\20260716_133921\\ai_research_summary.html",
+    "archive_dir":  "C:\\ftshare_data\\research_archive\\20260716\\20260716_133921"
+}
