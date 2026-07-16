@@ -230,3 +230,11 @@ powershell -ExecutionPolicy Bypass -File .\scripts\ftshare_fetch_history_plus_re
 
 适合继续扩展的方向包括：更长时间连续采样、分钟级历史落库、交易日历、复权处理、信号回测、行业映射缓存、异常值处理、时序数据库、实时告警、WebSocket或更高频数据源，以及把知识图谱与历史事件和公司基本面关系结合。
 
+
+## 强化学习择时研究
+
+新增 [`rl_research/`](rl_research/) 子项目：仅使用 FTShare `000852.XSHG` 后复权日线，在 Google Colab 比较 PPO、A2C、DQN 的中证1000指数风险暴露控制。状态在收盘后形成、动作在下一交易日开盘执行，最后六个月为隔离样本外测试。仓库不包含虚构收益；正式模型、轨迹和报告必须由真实 Colab 运行生成。
+
+- [中文研究说明](rl_research/README.md)
+- [English guide](rl_research/README_EN.md)
+- [Colab Notebook](rl_research/notebooks/csi1000_rl_colab.ipynb)

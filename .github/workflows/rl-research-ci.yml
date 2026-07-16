@@ -1,0 +1,35 @@
+name: RL research CI
+on:
+  push:
+    paths:
+      - "rl_research/**"
+      - ".github/workflows/rl-research-ci.yml"
+  pull_request:
+    paths:
+      - "rl_research/**"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: rl_research/requirements.txt
+      - run: pip install -r rl_research/requirements.txt && pip install -e rl_research
+      - run: pytest -q
+        working-directory: rl_research
+      - name: Validate notebook and integrity policy
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('rl_research/notebooks/csi1000_rl_colab.ipynb')
+          nb=json.loads(p.read_text(encoding='utf-8-sig'))
+          assert nb['nbformat']==4 and len(nb['cells'])>=8
+          assert all(not c.get('outputs') for c in nb['cells'] if c['cell_type']=='code')
+          forbidden=['api_key','secret_key','AKShare','Tushare','BaoStock']
+          text=p.read_text(encoding='utf-8-sig')
+          assert not any(x in text for x in forbidden)
+          assert pathlib.Path('rl_research/artifacts/results/NOT_RUN.md').exists()
+          PY

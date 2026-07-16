@@ -1,0 +1,10 @@
+artifacts/data/raw/*
+artifacts/data/processed/*
+artifacts/results/*
+!artifacts/data/raw/.gitkeep
+!artifacts/data/processed/.gitkeep
+!artifacts/results/NOT_RUN.md
+*.zip
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/

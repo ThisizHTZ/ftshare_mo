@@ -1,0 +1,31 @@
+project:
+  name: csi1000_recent_market_rl
+  symbol: 000852.XSHG
+  source: FTShare
+  adjust: Backward
+  years: 3
+  seed: 42
+data:
+  endpoint: https://market.ft.tech/gateway/api/v1/market/data/daec/history/ohlcs
+  raw_dir: artifacts/data/raw
+  processed_path: artifacts/data/processed/csi1000_daily_hfq.csv
+  quality_path: artifacts/data/processed/data_quality.json
+  timeout_seconds: 45
+  retries: 5
+split:
+  validation_months: 6
+  test_months: 6
+environment:
+  transaction_cost_bps: 10
+  drawdown_penalty: 0.05
+  turnover_penalty: 0.0
+  initial_equity: 1.0
+training:
+  algorithms: [PPO, A2C, DQN]
+  seeds: [11, 29, 47]
+  total_timesteps: 100000
+  dqn_positions: [0.0, 0.25, 0.5, 0.75, 1.0]
+  sensitivity_cost_bps: [0, 5, 10, 20]
+  run_ablations: true
+report:
+  output_dir: artifacts/results

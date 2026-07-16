@@ -230,3 +230,11 @@ After downloading the repository, open these files directly in a browser:
 
 Natural extensions include longer continuous collection, a minute-bar history store, trading calendars, corporate-action adjustment, signal backtesting, cached industry mappings, outlier treatment, a time-series database, real-time alerts, WebSocket or higher-frequency sources, and knowledge-graph links to historical events and company fundamentals.
 
+
+## Reinforcement-learning timing research
+
+The new [`rl_research/`](rl_research/) subproject uses only FTShare Backward-adjusted `000852.XSHG` daily bars to compare PPO, A2C, and DQN exposure-control policies in Google Colab. Actions execute at the next trading-day open and the final six months are isolated out-of-sample. No performance is claimed until a real Colab run completes.
+
+- [Chinese research guide](rl_research/README.md)
+- [English guide](rl_research/README_EN.md)
+- [Colab Notebook](rl_research/notebooks/csi1000_rl_colab.ipynb)
