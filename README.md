@@ -238,3 +238,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\ftshare_fetch_history_plus_re
 - [中文研究说明](rl_research/README.md)
 - [English guide](rl_research/README_EN.md)
 - [Colab Notebook](rl_research/notebooks/csi1000_rl_colab.ipynb)
+## 市场状态主课题
+
+新增 [`market_state_research/`](market_state_research/) 主研究模块，使用FTShare分钟指数、成分股市场宽度、申万行业扩散、权重与等权背离以及15分钟资金流，研究中证1000盘中市场状态与风险暴露。强化学习作为后续验证模型，不是主课题的唯一中心。
+
+- [研究说明](market_state_research/README.md)
+- [2026-07-15首期发现](market_state_research/FIRST_FINDINGS_20260715.md)

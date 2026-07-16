@@ -1,0 +1,8 @@
+{
+  "index_symbol": "000852.XSHG",
+  "minute_days": 10,
+  "expected_full_day_minutes": 241,
+  "minimum_component_matches": 980,
+  "capital_flow_times": ["1000", "1100", "1400", "1500"],
+  "source": "FTShare"
+}
