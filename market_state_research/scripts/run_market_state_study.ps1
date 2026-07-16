@@ -1,7 +1,8 @@
-﻿param(
+param(
     [Parameter(Mandatory=$true)][string]$TradeDate,
     [Parameter(Mandatory=$true)][string]$SnapshotRunDir,
     [string]$OutRoot = "C:\ftshare_data\market_state_research",
+    [string]$IndexMinuteCsv,
     [switch]$IncludeCapitalFlows
 )
 
@@ -47,16 +48,25 @@ function Normalize-Symbol {
     return "$Normalized.SZ"
 }
 
-$MinuteUrl = "https://market.ft.tech/gateway/api/v1/market/data/daec/history/prices?symbol=$($Config.index_symbol)&days=$($Config.minute_days)"
-$MinuteResponse = Invoke-FtShareJson $MinuteUrl
+$MinuteSource = "FTShare history/prices compatibility fallback"
+if ($IndexMinuteCsv) {
+    $MinuteResponse = @(Import-Csv -LiteralPath $IndexMinuteCsv -Encoding UTF8)
+    $MinuteSource = "FTShare ft_stock_candlesticks"
+} else {
+    $MinuteUrl = "https://market.ft.tech/gateway/api/v1/market/data/daec/history/prices?symbol=$($Config.index_symbol)&days=$($Config.minute_days)"
+    $MinuteResponse = @(Invoke-FtShareJson $MinuteUrl)
+}
 $MinuteRows = @($MinuteResponse | ForEach-Object {
-    $At = Convert-EpochMsToChinaTime ([int64]$_.ts_ms)
+    $RawTs = if ($_.ts_millis) { $_.ts_millis } else { $_.ts_ms }
+    $At = Convert-EpochMsToChinaTime ([int64]$RawTs)
     if ($At.ToString("yyyy-MM-dd") -eq $DateIso) {
+        $Close = if ($_.close) { Convert-ToNumberOrNull $_.close } else { Convert-ToNumberOrNull $_.price }
         [pscustomobject]@{
             trade_date=$DateIso; minute_time=$At.ToString("yyyy-MM-dd HH:mm:ss")
-            price=Convert-ToNumberOrNull $_.price; avg_price=Convert-ToNumberOrNull $_.avg_price
+            open=Convert-ToNumberOrNull $_.open; high=Convert-ToNumberOrNull $_.high; low=Convert-ToNumberOrNull $_.low
+            close=$Close; price=$Close; avg_price=Convert-ToNumberOrNull $_.avg_price
             volume=Convert-ToNumberOrNull $_.volume; turnover=Convert-ToNumberOrNull $_.turnover
-            source="FTShare"; frequency="1min"
+            source=$MinuteSource; frequency="1min"
         }
     }
 } | Where-Object { $null -ne $_ } | Sort-Object minute_time)
@@ -153,7 +163,7 @@ $MinuteComplete = $MinuteRows.Count -eq [int]$Config.expected_full_day_minutes
 $CapitalCoverage = @{}
 foreach ($Time in $Config.capital_flow_times) { $CapitalCoverage[$Time] = @($CapitalFlowRows | Where-Object { $_.slice_time -eq $Time }).Count }
 $Quality = [ordered]@{
-    trade_date=$DateIso; source="FTShare"; index_symbol=$Config.index_symbol
+    trade_date=$DateIso; source="FTShare"; minute_source=$MinuteSource; index_symbol=$Config.index_symbol
     minute_rows=$MinuteRows.Count; expected_minute_rows=[int]$Config.expected_full_day_minutes
     minute_complete=$MinuteComplete; component_snapshot_rows=$Snapshot.Count
     component_snapshot_complete=($Snapshot.Count -ge [int]$Config.minimum_component_matches)

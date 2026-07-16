@@ -1,0 +1,14 @@
+{
+    "ohlcs":  [
+                  {
+                      "ts_millis":  1784079060000,
+                      "low":  6980,
+                      "volume":  1,
+                      "turnover":  1,
+                      "close":  7005,
+                      "open":  7000,
+                      "symbol":  "000852.XSHG",
+                      "high":  6990
+                  }
+              ]
+}

@@ -1,34 +1,50 @@
-# 中证1000盘中市场状态、行业扩散与风险暴露研究
+# 中证1000分钟量价、市场状态与行业扩散研究
 
-本模块只使用 FTShare 官方接口，研究中证1000的分钟量价、市场宽度、权重与等权背离、行业扩散和资金流。研究输出是统计状态与待检验假设，不是个股推荐。
+本模块只使用 FTShare 数据，研究中证1000指数分钟量价、市场宽度、权重与等权背离、行业扩散和资金流。输出是可检验的市场状态假设，不是个股推荐。
 
-## 第一阶段
+## 分钟数据基座
 
-- 拉取中证1000指数1分钟数据并检查每个交易日完整性。
-- 复用当日中证1000成分、权重、收盘快照和申万行业映射。
-- 计算收盘市场宽度、等权与权重收益背离、行业扩散与集中度。
-- 生成数据质量文件和独立 HTML 研究报告。
-- 缺失的历史盘中成分宽度保持为空，不使用收盘数据反推。
+历史分钟数据以 `ft_stock_candlesticks` 为主，多个指数使用 `ft_stock_candlesticks_batch`。参数契约：
 
-## 运行
+- `symbol`: 如 `000852.XSHG`
+- `interval_unit=minute`
+- `interval_value=1`
+- `since_ts_millis` / `until_ts_millis`: 北京时间对应的毫秒时间戳
+- `limit`: 单次返回上限
+- 返回字段：`open/high/low/close/volume/turnover/ts_millis`
+
+单次起止跨度不得超过3天。`new_candlestick_request_plan.ps1` 自动切段；函数结果保存为JSON后，由 `normalize_candlesticks.ps1` 合并、按 `symbol+ts_millis` 去重、排序并执行OHLCV质量门禁。不要把新函数参数直接拼到旧 REST 路径；它是 FTShare MCP 函数契约。
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\new_candlestick_request_plan.ps1 `
+  -Symbols 000852.XSHG `
+  -Since '2026-01-01 00:00:00' `
+  -Until '2026-07-15 23:59:59' `
+  -OutputPath .\candlestick_request_plan.json
+
+powershell -ExecutionPolicy Bypass -File .\scripts\normalize_candlesticks.ps1 `
+  -InputPath .\raw\chunk_*.json `
+  -OutputCsv .\data\csi1000_1min.csv
+```
+
+## 运行主研究
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\run_market_state_study.ps1 `
   -TradeDate 20260715 `
-  -SnapshotRunDir C:\ftshare_data\daily_intraday_summary\20260715_170202
+  -SnapshotRunDir C:\ftshare_data\daily_intraday_summary\20260715_170202 `
+  -IndexMinuteCsv .\data\csi1000_1min.csv
 ```
 
-输出默认写入 `C:\ftshare_data\market_state_research\<trade_date>_<run_id>\`。
+不传 `IndexMinuteCsv` 时仍可使用旧 `history/prices` 做近期兼容验证，但质量报告会明确标记为回退来源。正式历史研究应使用 `ft_stock_candlesticks` 的OHLCV。
 
+主要产物：`index_minute.csv`、`index_15m_features.csv`、`component_capital_flows_15m.csv`、`sector_diffusion.csv`、`research_summary.json`、`data_quality.json` 和 `report.html`。
 
-主要产物：
+## 主课题假设
 
-- `index_minute.csv`：指数1分钟价格、均价、成交量和成交额。
-- `index_15m_features.csv`：15分钟收益、实现波动率、成交量与成交额。
-- `component_capital_flows_15m.csv`：四个锚点的中证1000成分股资金流。
-- `sector_diffusion.csv`：行业平均收益、方向和权重贡献。
-- `research_summary.json`：宽度、等权/权重背离、行业扩散与状态标签。
-- `data_quality.json`：分钟完整性、成分覆盖率和不可恢复的数据缺口。
-- `report.html`：独立研究看板。
+1. 指数15分钟收益、实现波动率和成交额冲击能否识别风险开启、震荡与风险收缩状态。
+2. 等权收益与指数权重收益背离是否预示市场扩散或集中化的后续变化。
+3. 行业扩散与资金流方向一致时，状态延续概率是否更高。
+4. 成交放大但价格不延续时，是否代表短周期过热或反转风险。
 
-首期单日发现见 [`FIRST_FINDINGS_20260715.md`](FIRST_FINDINGS_20260715.md)。单日结果只用于形成待检验假设；至少积累60个交易日后才进行条件收益、显著性和样本外检验。
+至少积累60个交易日后，再做滚动训练、样本外验证、交易成本敏感性和统计显著性检验。首日发现见 `FIRST_FINDINGS_20260715.md`。
